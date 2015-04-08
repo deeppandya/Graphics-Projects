@@ -1,0 +1,42 @@
+/*	COMP 6761 Assignment 1 Framework
+	Created by Kaustubha Mendhurwar on 09/09/14.
+	Copyright (c) 2014 Concordia University. All rights reserved.
+*/
+
+#version 430
+
+//uniform mat4 modelMatrix;
+uniform mat4 viewMatrix;
+uniform mat4 WorldTransform;
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 6) out;
+in vec3 tePosition[3];
+in vec3 tePatchDistance[3];
+out vec3 gFacetNormal;
+out vec3 gPatchDistance;
+out vec3 gTriDistance;
+out vec4 vertex_color;
+
+void main()
+{
+    mat4 MV = viewMatrix*WorldTransform;
+	mat3 NormalMatrix = transpose(inverse(mat3(MV)));
+
+	vec3 A = tePosition[2] - tePosition[0];
+    vec3 B = tePosition[1] - tePosition[0];
+    gFacetNormal = NormalMatrix * normalize(cross(A, B));
+    
+    gPatchDistance = tePatchDistance[0];
+    gTriDistance = vec3(1, 0, 0);
+    gl_Position = gl_in[0].gl_Position; vertex_color = vec4(1,0,0,1);EmitVertex();
+
+    gPatchDistance = tePatchDistance[1];
+    gTriDistance = vec3(0, 1, 0);
+    gl_Position = gl_in[1].gl_Position; vertex_color = vec4(1,0,0,1);EmitVertex();
+
+    gPatchDistance = tePatchDistance[2];
+    gTriDistance = vec3(0, 0, 1);
+    gl_Position = gl_in[2].gl_Position; vertex_color = vec4(0,0,0,1);EmitVertex();
+
+    EndPrimitive();
+}

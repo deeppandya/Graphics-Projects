@@ -1,0 +1,94 @@
+#version 430
+#extension GL_ARB_compute_shader : enable
+#extension GL_ARB_shader_storage_buffer_object : enable
+uniform float dt;
+uniform int g_NumParticles;
+uniform float iteration;
+uniform float design;
+
+// Compute shader invocations in each work group
+struct QuadPos{
+	float X0pos; float Y0pos; float Z0pos;
+	float X1pos; float Y1pos; float Z1pos;
+	float X2pos; float Y2pos; float Z2pos;
+	float X3pos; float Y3pos; float Z3pos;
+	float X4pos; float Y4pos; float Z4pos;
+	float X5pos; float Y5pos; float Z5pos;
+};
+/*
+struct particle{
+	vec4 Vel;
+};*/
+layout(std430, binding = 1) buffer buffer_Pos 
+{
+	QuadPos quad [];
+};
+layout(std430, binding = 2) buffer buffer_Vel
+{
+	vec4 Velocity[];
+};
+
+layout(local_size_x=100, local_size_y=1, local_size_z=1) in;
+
+
+const float gAccel = 10;
+
+float randf(vec2 co){
+    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453) * 1000.0;
+}
+
+void main(){
+	//gl_GlobalInvocationID = gl_WorkGroupID * gl_WorkGroupSize + gl_LocalInvocationID;
+	uint index = gl_GlobalInvocationID.x;
+	vec4 Vel;
+	float gravity=2.0;
+	float time=0.2;
+	QuadPos qtmp;
+	qtmp = quad[index];
+	vec2 r1 = vec2(qtmp.X0pos, qtmp.Z0pos);
+	vec2 r2 = vec2(qtmp.Z0pos,qtmp.X0pos);
+	float rand1 = mod(randf(r1)*10,6.0);
+	float rand2 = randf(r2);
+	Vel = Velocity[index];
+	float t = 0.05;
+	if((qtmp.Y0pos>rand1)||(Vel.w<=0)||(qtmp.X0pos>2.0)){
+		
+		qtmp.X0pos = 0.0f; qtmp.Y0pos = 0.0f; qtmp.Z0pos = 0.0f;
+		qtmp.X1pos = 0.02f; qtmp.Y1pos = 0.02f; qtmp.Z1pos = 0.0f;
+		qtmp.X2pos = 0.0f; qtmp.Y2pos = 0.02f; qtmp.Z2pos = 0.0f;
+		qtmp.X3pos = 0.0f; qtmp.Y3pos = 0.0f; qtmp.Z3pos = 0.0f;
+		qtmp.X4pos = 0.02f; qtmp.Y4pos = 0.02f; qtmp.Z4pos = 0.0f;
+		qtmp.X5pos = 0.02f; qtmp.Y5pos = 0.0f; qtmp.Z5pos = 0.0f;
+	
+			
+		//Vel.y = rand1-(gravity*time*20);
+		Vel.y=rand1+0.2;
+		
+		Vel.w = rand1;
+	}else{
+	    qtmp.X0pos += Vel.x*t; qtmp.X1pos += Vel.x*t;
+		qtmp.X2pos += Vel.x*t; qtmp.X3pos += Vel.x*t;
+		qtmp.X4pos += Vel.x*t; qtmp.X5pos += Vel.x*t;
+
+		qtmp.Y0pos += Vel.y*t; qtmp.Y1pos += Vel.y*t;
+		qtmp.Y2pos += Vel.y*t; qtmp.Y3pos += Vel.y*t;
+		qtmp.Y4pos += Vel.y*t; qtmp.Y5pos += Vel.y*t;
+
+		qtmp.Z0pos += Vel.z*t; qtmp.Z1pos += Vel.z*t;
+		qtmp.Z2pos += Vel.z*t; qtmp.Z3pos += Vel.z*t;
+		qtmp.Z4pos += Vel.z*t; qtmp.Z5pos += Vel.z*t;
+		
+
+		//Vel.x+= gAccel * t;
+		Vel.y += gAccel * t;
+		//Vel.z += gAccel * t;
+		Vel.w-=1.1*t;
+		}
+	
+	quad[index] = qtmp;
+	Velocity[index] = Vel;
+}
+
+
+
+	

@@ -1,0 +1,55 @@
+/*	COMP 6761 Assignment 2 Framework
+	Created by Kaustubha Mendhurwar on 13/10/14.
+	Copyright (c) 2014 Concordia University. All rights reserved.
+*/
+
+#version 330
+
+// Ouput data
+out vec4 color;
+uniform sampler1D myTextureSampler;
+in vec2 z;
+//uniform vec2 c=vec2(0.2,0.2);
+uniform vec2 C;
+vec2 c;
+uniform int iteration;
+uniform int method;
+
+void main()
+{
+vec2 _z=z;
+int i;
+if(method==1)
+{
+	for(i=0;i<iteration;i++)
+	{
+	vec2 _temp;
+		_temp.x=_z.x*_z.x-_z.y*_z.y+C.x;
+		_temp.y=2*_z.x*_z.y+C.y;
+		if((_temp.x*_temp.x+_temp.y*_temp.y)>4)
+		break;
+		_z=_temp;
+	}
+}
+else if(method==2)
+{
+	//c.x = 1.3333 * (_z.x - 0.5) * 0.1f - C.x;
+    //c.y = (_z.y - 0.5) * 0.1f - C.y;
+	for(i=0;i<iteration;i++)
+	{
+	vec2 _temp;
+		//_temp.x=_z.x*_z.x-_z.y*_z.y+c.x;
+		//_temp.y=2*_z.x*_z.y+c.y;
+		_temp.x=_z.x*_z.x-_z.y*_z.y+z.x;
+		_temp.y=2*_z.x*_z.y+z.y;
+		if((_temp.x*_temp.x+_temp.y*_temp.y)>4)
+		break;
+		_z=_temp;
+	}
+}
+
+if(i==iteration)
+	color=vec4(0,0,0,1);
+else
+	color = texture(myTextureSampler, float(i)/float(iteration));	
+}

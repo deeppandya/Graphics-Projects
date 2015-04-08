@@ -1,0 +1,23 @@
+/*	COMP 6761 Assignment 2 Framework
+	Created by Kaustubha Mendhurwar on 13/10/14.
+	Copyright (c) 2014 Concordia University. All rights reserved.
+*/
+
+#version 330
+
+// Input vertex data, different for all executions of this shader.
+layout(location = 0) in vec3 vertexPosition_modelspace;
+
+// Values that stay constant for the whole mesh.
+uniform mat4 MVP;
+out vec2 z;
+uniform float zoom;
+uniform vec2 Movement;
+
+void main()
+{
+	// Output position of the vertex, in clip space : MVP * position
+	gl_Position =  MVP * vec4(vertexPosition_modelspace,1);	
+	z=(vertexPosition_modelspace.xy*zoom)+Movement;
+}
+

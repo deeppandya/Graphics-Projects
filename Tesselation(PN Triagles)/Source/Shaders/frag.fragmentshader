@@ -1,0 +1,33 @@
+/*	COMP 6761 Assignment 1 Framework
+	Created by Kaustubha Mendhurwar on 09/09/14.
+	Copyright (c) 2014 Concordia University. All rights reserved.
+*/
+
+#version 430
+
+out vec4 FragColor;
+in vec3 gFacetNormal;
+in vec3 gTriDistance;
+in vec3 gPatchDistance;
+//in float gPrimitive;
+in vec4 vertex_color;
+
+float amplify(float d, float scale, float offset)
+{
+    d = scale * d + offset;
+    d = clamp(d, 0, 1);
+    d = 1 - exp2(-2*d*d);
+    return d;
+}
+
+void main()
+{
+    vec3 color = vec3(1.0,1.0,1.0);
+
+    float d1 = min(min(gTriDistance.x, gTriDistance.y), gTriDistance.z);
+    float d2 = min(min(gPatchDistance.x, gPatchDistance.y), gPatchDistance.z);
+    color = amplify(d1, 40, -0.5) * amplify(d2, 60, -0.5) * color;
+
+    FragColor = vec4(color, 1.0);
+	//FragColor = vertex_color;	
+}

@@ -1,0 +1,18 @@
+/*	COMP 6761 Assignment 1 Framework
+	Created by Kaustubha Mendhurwar on 09/09/14.
+	Copyright (c) 2014 Concordia University. All rights reserved.
+*/
+#version 430
+
+layout(location = 0) in vec3 vertexPosition_modelspace;
+layout(location = 1) in vec3 vertexNormal_modelspace;
+
+out vec3 _vertices;
+out vec3 _normals;
+
+void main()
+{
+	_vertices=vertexPosition_modelspace;
+	_normals=normalize(vertexNormal_modelspace);
+}
+
